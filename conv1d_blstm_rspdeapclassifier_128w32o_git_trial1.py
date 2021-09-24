@@ -32,6 +32,9 @@ import tensorflow as tf
 tf.random.set_seed(0)
 
 import time
+GPUS = ["GPU:0"] #https://github.com/jeffheaton/present/blob/master/youtube/gpu/keras-dual-gpu.ipynb
+strategy = tf.distribute.MirroredStrategy( GPUS )
+print('Number of devices: %d' % strategy.num_replicas_in_sync) 
 
 
 # importing required modules
@@ -121,21 +124,30 @@ print(x_test.shape)
 from keras.callbacks import EarlyStopping
 from keras.callbacks import ModelCheckpoint
 
-model1 = Sequential()
-model1.add(Conv1D(filters=64, kernel_size=3,  strides=1, padding="causal", activation='relu', input_shape=(x_train.shape[1],x_train.shape[2])))
-#model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
-model1.add(Bidirectional(LSTM(64, return_sequences=True)))
-model1.add(Dropout(0.3))
-model1.add(Bidirectional(LSTM(64)))
-model1.add(Dropout(0.3))
-#model.add(MaxPooling1D(pool_size=2))
-#model.add(Flatten())
-model1.add(Dense(100, activation='relu'))
-model1.add(Dropout(0.3))
-model1.add(Dense(2, activation='softmax'))
-model1.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-# patient early stopping
-es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=70)
-mc = ModelCheckpoint('rspdeap_256bs_128w_32o_model1_epoch500_git.h5', monitor='accuracy', mode='max', verbose=1, save_best_only=True)
-# fit network
-history=model1.fit(x_train, y_train_resampled, epochs=500, batch_size=256, verbose=2,validation_data=(x_test, y_test_resampled))
+tf.get_logger().setLevel('ERROR')
+
+start = time.time()
+with strategy.scope():
+    
+    model1 = Sequential()
+    model1.add(Conv1D(filters=64, kernel_size=3,  strides=1, padding="causal", activation='relu', input_shape=(x_train.shape[1],x_train.shape[2])))
+    #model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
+    model1.add(Bidirectional(LSTM(64, return_sequences=True)))
+    model1.add(Dropout(0.3))
+    model1.add(Bidirectional(LSTM(64)))
+    model1.add(Dropout(0.3))
+    #model.add(MaxPooling1D(pool_size=2))
+    #model.add(Flatten())
+    model1.add(Dense(100, activation='relu'))
+    model1.add(Dropout(0.3))
+    model1.add(Dense(2, activation='softmax'))
+    model1.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    # patient early stopping
+    es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=70)
+    mc = ModelCheckpoint('rspdeap_256bs_128w_32o_model1_epoch500_git.h5', monitor='accuracy', mode='max', verbose=1, save_best_only=True)
+    # fit network
+    history=model1.fit(x_train, y_train_resampled, epochs=500, batch_size=256, verbose=2,validation_data=(x_test, y_test_resampled))
+
+elapsed = time.time()-start
+print ('Training time: {elapsed in mins)}', elapsed/60)
+
