@@ -153,7 +153,7 @@ with strategy.scope():
     
 
     model3 = Sequential()
-    model3.add(Dense(100, activation='relu'))
+    model3.add(Dense(100, activation='relu', input_dim = 1))
     model3.add(BatchNormalization())
     model3.add(Dropout(0.3))
     model3.add(Dense(100, activation='relu'))
