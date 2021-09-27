@@ -32,12 +32,32 @@ from sklearn.model_selection import train_test_split
 
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.layers import Bidirectional
-from tensorflow.keras import optimizers 
 from keras.callbacks import EarlyStopping
 from keras.callbacks import ModelCheckpoint
 
+GPUS = ["GPU:0"] #https://github.com/jeffheaton/present/blob/master/youtube/gpu/keras-dual-gpu.ipynb
+strategy = tf.distribute.MirroredStrategy( GPUS )
+print('Number of devices: %d' % strategy.num_replicas_in_sync) 
 
-gsr_data, gsr_label = joblib.load(open('C:/Users/Sowmya/OneDrive - Athlone Institute Of Technology/PhD/DEAP/DATABASE/Python code/LSTM/GSR/lstm_slider128_gsr_raw_overlap32_withbaseline.dat', 'rb'))
+
+# importing required modules
+from zipfile import ZipFile
+  
+# specifying the zip file name
+file_name = "lstm_slider128_gsr_raw_overlap32_withbaseline.zip"
+
+# opening the zip file in READ mode
+with ZipFile(file_name, 'r') as zip:
+    # printing all the contents of the zip file
+    zip.printdir()
+  
+    # extracting all the files
+    print('Extracting all the files now...')
+    zip.extractall()
+    print('Done!')
+
+
+gsr_data, gsr_label = joblib.load(open('lstm_slider128_gsr_raw_overlap32_withbaseline.dat', 'rb'))
 
 def data_binarizer(ratings, threshold1, threshold2):
 	"""binarizes the data below and above the threshold"""
