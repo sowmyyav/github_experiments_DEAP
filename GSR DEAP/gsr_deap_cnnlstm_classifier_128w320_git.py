@@ -173,7 +173,7 @@ with strategy.scope():
     model2.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 # patient early stopping
 es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=50)
-mc = ModelCheckpoint('gsr_500bs_128w_32o_model2.h5', monitor='accuracy', mode='max', verbose=1, save_best_only=True)
+mc = ModelCheckpoint('gsr_1000bs_128w_32o_model2.h5', monitor='accuracy', mode='max', verbose=1, save_best_only=True)
 model2.summary()
 # fit network
 history=model2.fit(x_gsr_train, y_gsr_train_resampled, epochs=500, batch_size=1000, verbose=1, callbacks = [es,mc],validation_data=(x_gsr_vald, y_gsr_vald_resampled))
