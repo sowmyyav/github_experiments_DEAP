@@ -35,7 +35,7 @@ from tensorflow.keras.layers import Bidirectional
 from keras.callbacks import EarlyStopping
 from keras.callbacks import ModelCheckpoint
 
-GPUS = ["GPU:0"] #https://github.com/jeffheaton/present/blob/master/youtube/gpu/keras-dual-gpu.ipynb
+GPUS = ["GPU:0", "GPU:1","GPU:2","GPU:3"] #https://github.com/jeffheaton/present/blob/master/youtube/gpu/keras-dual-gpu.ipynb
 strategy = tf.distribute.MirroredStrategy( GPUS )
 print('Number of devices: %d' % strategy.num_replicas_in_sync) 
 
@@ -141,6 +141,13 @@ print(x_gsr_vald.shape)
 print(x_gsr_test1.shape)
 
 start = time.time()
+# Nicely formatted time string
+def hms_string(sec_elapsed):
+    h = int(sec_elapsed / (60 * 60))
+    m = int((sec_elapsed % (60 * 60)) / 60)
+    s = sec_elapsed % 60
+    return "{}:{:>02}:{:>05.2f}".format(h, m, s)
+
 with strategy.scope():
     
     model2 = Sequential()
@@ -169,7 +176,7 @@ es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=50)
 mc = ModelCheckpoint('gsr_500bs_128w_32o_model2.h5', monitor='accuracy', mode='max', verbose=1, save_best_only=True)
 model2.summary()
 # fit network
-history=model2.fit(x_gsr_train, y_gsr_train_resampled, epochs=500, batch_size=500, verbose=1, callbacks = [es,mc],validation_data=(x_gsr_vald, y_gsr_vald_resampled))
+history=model2.fit(x_gsr_train, y_gsr_train_resampled, epochs=500, batch_size=1000, verbose=1, callbacks = [es,mc],validation_data=(x_gsr_vald, y_gsr_vald_resampled))
 
 elapsed = time.time()-start
-print ('Training time: {elapsed in mins)}', elapsed/60)
+print ('Training time: {elapsed in mins)}', hms_string(elapsed))
