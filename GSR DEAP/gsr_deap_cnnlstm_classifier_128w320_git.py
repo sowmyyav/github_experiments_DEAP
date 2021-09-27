@@ -71,7 +71,7 @@ def data_binarizer(ratings, threshold1, threshold2):
 
 #convert binarized label (0 and 1) into categorical data- this generates 2 classes
 from tensorflow.keras.utils import to_categorical
-y_valence = np.array(data_binarizer([el[0] for el in gsr_label],4.5,4.5))
+y_valence = np.array(data_binarizer([el[0] for el in gsr_label],5,5))
 Z1 = np.ravel(y_valence)
 y_val = to_categorical(Z1)
 y_val
@@ -162,5 +162,5 @@ es = EarlyStopping(monitor='accuracy', mode='max', verbose=1, patience=50)
 mc = ModelCheckpoint('gsr_250bs_128w_32o_model1.h5', monitor='accuracy', mode='max', verbose=1, save_best_only=True)
 model1.summary()
 # fit network
-history=model1.fit(x_gsr_train, y_gsr_train_resampled, epochs=500, batch_size=250, verbose=1, callbacks = [es,mc],validation_data=(x_gsr_vald, y_gsr_vald_resampled))
+history=model1.fit(x_gsr_train, y_gsr_train_resampled, epochs=500, batch_size=500, verbose=1, callbacks = [es,mc],validation_data=(x_gsr_vald, y_gsr_vald_resampled))
 
