@@ -71,7 +71,7 @@ def data_binarizer(ratings, threshold1, threshold2):
 	return binarized
 
 #convert binarized label (0 and 1) into categorical data- this generates 2 classes
-from tensorflow.keras.utils import to_categorical
+
 y_valence = np.array(data_binarizer([el[0] for el in gsr_label],5,5))
 Z1 = np.ravel(y_valence)
 y_val = to_categorical(Z1)
@@ -89,9 +89,9 @@ print(X_test_gsr_val.shape)
 
 
 #use stratify for split   
-X_test1_gsr_val, X_vald_gsr_val, y_test1_gsr_val, y_vald_gsr_val = train_test_split(X_test_gsr_val, y_test_gsr_val, test_size=0.5, random_state=42, stratify=y_test_gsr_val)
-print(X_vald_gsr_val.shape)
-print(X_test1_gsr_val.shape)
+#X_test1_gsr_val, X_vald_gsr_val, y_test1_gsr_val, y_vald_gsr_val = train_test_split(X_test_gsr_val, y_test_gsr_val, test_size=0.5, random_state=42, stratify=y_test_gsr_val)
+#print(X_vald_gsr_val.shape)
+#print(X_test1_gsr_val.shape)
 
 
 # Create balanced data
@@ -100,18 +100,18 @@ import imblearn
 from imblearn.over_sampling import RandomOverSampler
 ros = RandomOverSampler(random_state=0)
 X_gsr_train_resampled, y_gsr_train_resampled = ros.fit_resample(X_train_gsr_val, y_train_gsr_val)
-X_gsr_vald_resampled, y_gsr_vald_resampled = ros.fit_resample(X_vald_gsr_val, y_vald_gsr_val)
-X_gsr_test1_resampled, y_gsr_test1_resampled = ros.fit_resample(X_test1_gsr_val, y_test1_gsr_val)
+#X_gsr_vald_resampled, y_gsr_vald_resampled = ros.fit_resample(X_vald_gsr_val, y_vald_gsr_val)
+X_gsr_test1_resampled, y_gsr_test1_resampled = ros.fit_resample(X_test_gsr_val, y_test_gsr_val)
 print(X_gsr_train_resampled.shape)
-print(X_gsr_vald_resampled.shape)
+#print(X_gsr_vald_resampled.shape)
 print(X_gsr_test1_resampled.shape)
 
 from collections import Counter
  # summarize observations by class labeL
 counter = Counter(y_gsr_train_resampled)
 print(counter) 
-counter = Counter(y_gsr_vald_resampled)
-print(counter) 
+#counter = Counter(y_gsr_vald_resampled)
+#print(counter) 
 counter = Counter(y_gsr_test1_resampled)
 print(counter) 
 
@@ -119,8 +119,8 @@ print(counter)
 #convert binarized label (0, 1) into categorical data- this generates 2 classes
 Z1 = np.ravel(y_gsr_train_resampled)
 y_gsr_train_resampled = to_categorical(Z1)
-Z11 = np.ravel(y_gsr_vald_resampled)
-y_gsr_vald_resampled = to_categorical(Z11)
+#Z11 = np.ravel(y_gsr_vald_resampled)
+#y_gsr_vald_resampled = to_categorical(Z11)
 #y_test
 Z22 = np.ravel(y_gsr_test1_resampled)
 y_gsr_test1_resampled = to_categorical(Z22)
@@ -129,16 +129,16 @@ y_gsr_test1_resampled = to_categorical(Z22)
 from sklearn.preprocessing import StandardScaler
 sc = StandardScaler()
 gsr_training_set_scaled = sc.fit_transform(X_gsr_train_resampled)
-gsr_vald_set_scaled = sc.transform(X_gsr_vald_resampled)
+#gsr_vald_set_scaled = sc.transform(X_gsr_vald_resampled)
 gsr_testing1_set_scaled = sc.transform(X_gsr_test1_resampled)
 
 n_features = 1
 #order = F,  fortran like is important for separating 2 features (first 128 columns = 1 feature, next 128 columns -2nd feature), else every alternate column become 1 feature. 
-x_gsr_train = gsr_training_set_scaled.reshape(gsr_training_set_scaled.shape[0], 128,n_features,  order='F' ) 
-x_gsr_vald = gsr_vald_set_scaled.reshape(gsr_vald_set_scaled.shape[0], 128,n_features,  order='F' ) 
-x_gsr_test1 = gsr_testing1_set_scaled.reshape(gsr_testing1_set_scaled.shape[0], 128, n_features, order='F')
+x_gsr_train = gsr_training_set_scaled.reshape(gsr_training_set_scaled.shape[0], gsr_training_set_scaled.shape[1],n_features ) 
+#x_gsr_vald = gsr_vald_set_scaled.reshape(gsr_vald_set_scaled.shape[0], 128,n_features ) 
+x_gsr_test1 = gsr_testing1_set_scaled.reshape(gsr_testing1_set_scaled.shape[0], gsr_testing1_set_scaled.shape[1], n_features)
 print(x_gsr_train.shape)
-print(x_gsr_vald.shape)
+#print(x_gsr_vald.shape)
 print(x_gsr_test1.shape)
 
 start = time.time()
@@ -153,6 +153,18 @@ with strategy.scope():
     
 
     model3 = Sequential()
+    model3.add(Conv1D(filters=64, kernel_size=3,  strides=1, padding="causal", activation='relu', input_shape=(x_gsr_train.shape[1],x_gsr_train.shape[2])))
+    #model1.add(BatchNormalization())  
+    model3.add(Dropout(0.3))
+    model3.add(Conv1D(filters=128, kernel_size=3, activation='relu'))
+    #model1.add(BatchNormalization())  
+    model3.add(Dropout(0.3))
+    model3.add(Bidirectional(LSTM(64, return_sequences=True)))
+    model3.add(BatchNormalization())  
+    model3.add(Dropout(0.3))
+    model3.add(Bidirectional(LSTM(64)))
+    model3.add(BatchNormalization())  
+    model3.add(Dropout(0.3))
     model3.add(Dense(100, activation='relu', input_dim = 1))
     model3.add(BatchNormalization())
     model3.add(Dropout(0.3))
@@ -166,7 +178,8 @@ es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=50)
 mc = ModelCheckpoint('gsr_2000bs_128w_32o_model3.h5', monitor='accuracy', mode='max', verbose=1, save_best_only=True)
 model3.summary()
 # fit network
-history=model3.fit(x_gsr_train, y_gsr_train_resampled, epochs=50, batch_size=2000, verbose=1, callbacks = [es,mc],validation_data=(x_gsr_vald, y_gsr_vald_resampled))
+#history=model3.fit(x_gsr_train, y_gsr_train_resampled, epochs=50, batch_size=2000, verbose=1, callbacks = [es,mc],validation_data=(x_gsr_vald, y_gsr_vald_resampled))
+history=model3.fit(x_gsr_train, y_gsr_train_resampled, epochs=50, batch_size=500, verbose=1, callbacks = [es,mc],validation_data=(x_gsr_test1, y_gsr_test1_resampled))
 
 elapsed = time.time()-start
 print ('Training time: {elapsed in mins)}', hms_string(elapsed))
