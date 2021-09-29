@@ -193,11 +193,11 @@ with strategy.scope():
     model2.add(Dense(2, activation='softmax'))
     model2.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 # patient early stopping
-es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=50)
+es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=70)
 mc = ModelCheckpoint('emg2channels_500bs_128w_32o_model2_git.h5', monitor='accuracy', mode='max', verbose=1, save_best_only=True)
 model2.summary()
 # fit network
-history=model2.fit(x_emg_train, y_emg_train_resampled, epochs=500, batch_size=500, verbose=1, callbacks = [es,mc],validation_data=(x_emg_vald, y_emg_vald_resampled))
+history=model2.fit(x_emg_train, y_emg_train_resampled, epochs=1000, batch_size=500, verbose=1, callbacks = [es,mc],validation_data=(x_emg_vald, y_emg_vald_resampled))
 
 elapsed = time.time()-start
 print ('Training time: {elapsed in mins)}', hms_string(elapsed))
