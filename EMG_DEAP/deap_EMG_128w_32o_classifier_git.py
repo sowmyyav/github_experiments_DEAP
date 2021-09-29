@@ -46,10 +46,11 @@ print('Number of devices: %d' % strategy.num_replicas_in_sync)
 from zipfile import ZipFile
   
 # specifying the zip file name
-file_name = "lstm_slider128_emg1hstack2_raw_overlap32_withbaseline.zip"
+
+file_name1 = "lstm_slider128_emg1_raw_overlap32_withbaseline.zip"
 
 # opening the zip file in READ mode
-with ZipFile(file_name, 'r') as zip:
+with ZipFile(file_name1, 'r') as zip:
     # printing all the contents of the zip file
     zip.printdir()
   
@@ -58,8 +59,25 @@ with ZipFile(file_name, 'r') as zip:
     zip.extractall()
     print('Done!')
 
-emg_data, emg_label = joblib.load(open('lstm_slider128_emg1hstack2_raw_overlap32_withbaseline.dat', 'rb'))
+emg1_data, emg1_label = joblib.load(open('lstm_slider128_emg1_raw_overlap32_withbaseline.dat', 'rb'))
 
+
+file_name2 = "lstm_slider128_emg2_raw_overlap32_withbaseline.zip"
+
+# opening the zip file in READ mode
+with ZipFile(file_name2, 'r') as zip:
+    # printing all the contents of the zip file
+    zip.printdir()
+  
+    # extracting all the files
+    print('Extracting all the files now...')
+    zip.extractall()
+    print('Done!')
+
+emg2_data, emg2_label = joblib.load(open('lstm_slider128_emg2_raw_overlap32_withbaseline.dat', 'rb'))
+
+
+emg_data = np.hstack((emg1_data ,emg2_data ))
 def data_binarizer(ratings, threshold1, threshold2):
 	"""binarizes the data below and above the threshold"""
 	binarized = []
@@ -72,7 +90,7 @@ def data_binarizer(ratings, threshold1, threshold2):
 
 #convert binarized label (0 and 1) into categorical data- this generates 2 classes
 from tensorflow.keras.utils import to_categorical
-y_valence = np.array(data_binarizer([el[0] for el in emg_label],5,5))
+y_valence = np.array(data_binarizer([el[0] for el in emg1_label],5,5))
 Z1 = np.ravel(y_valence)
 y_val = to_categorical(Z1)
 y_val
