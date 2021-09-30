@@ -36,7 +36,7 @@ from keras.callbacks import ModelCheckpoint
 
 GPUS = ["GPU:0", "GPU:1","GPU:2","GPU:3"] #https://github.com/jeffheaton/present/blob/master/youtube/gpu/keras-dual-gpu.ipynb
 #strategy = tf.distribute.MirroredStrategy( GPUS)
-strategy = tf.distribute.MirroredStrategy(devices = GPUS) 
+strategy = tf.distribute.MirroredStrategy(devices = GPUS, cross_device_ops=tf.distribute.HierarchicalCopyAllReduce()) 
 print('Number of devices: %d' % strategy.num_replicas_in_sync) 
 
 
