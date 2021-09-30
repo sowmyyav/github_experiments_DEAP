@@ -57,7 +57,7 @@ with ZipFile(file_name, 'r') as zip:
     print('Done!')
 
 
-bvp_data1, bvp_label1 = joblib.load(open('lstm_slider128_bvp_raw_overlap32_withbaseline', 'rb'))
+bvp_data1, bvp_label1 = joblib.load(open('lstm_slider128_bvp_raw_overlap32_withbaseline.dat', 'rb'))
 
 
 def data_binarizer(ratings, threshold1, threshold2):
