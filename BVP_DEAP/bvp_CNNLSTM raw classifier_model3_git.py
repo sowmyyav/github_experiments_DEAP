@@ -165,7 +165,7 @@ es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=30)
 mc = ModelCheckpoint('BVP_256bs_128w_32o_model3.h5', monitor='accuracy', mode='max', verbose=1, save_best_only=True)
 model3.summary()
 # fit network
-history=model3.fit(x_bvp_train, y_bvp_train_resampled, epochs=500, batch_size=256, verbose=1,validation_data=(x_bvp_test, y_bvp_test_resampled))
+history=model3.fit(x_bvp_train, y_bvp_train_resampled, epochs=500, batch_size=256, callbacks = [es,mc], verbose=1,validation_data=(x_bvp_test, y_bvp_test_resampled))
 
 elapsed = time.time()-start
 print ('Training time: {elapsed in mins)}', hms_string(elapsed))
