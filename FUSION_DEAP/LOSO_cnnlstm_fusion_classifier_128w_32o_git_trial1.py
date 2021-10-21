@@ -99,7 +99,7 @@ with ZipFile(file_name, 'r') as zip:
     print('Extracting all the files now...')
     zip.extractall()
     print('Done!')
-sub_ID, gsr_data, gsr_label = joblib.load(open('lstm_slider128_gsr_raw_overlap32__subID_withbaseline.dat', 'rb'))
+sub_ID, gsr_data, gsr_label = joblib.load(open('lstm_slider128_gsr_raw_overlap32_subID_withbaseline.dat', 'rb'))
 
 file_name = "lstm_slider128_rsp_raw_overlap32_withbaseline.zip"
 # opening the zip file in READ mode
