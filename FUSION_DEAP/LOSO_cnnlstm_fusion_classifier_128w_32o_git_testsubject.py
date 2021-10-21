@@ -218,7 +218,7 @@ y_train = np.array(data_train['y_val']) #Outcome variable here
 print(X_train.shape)
 print(y_train.shape)
 
-
+'''
 # Create balanced data
 #oversample
 import imblearn
@@ -232,30 +232,30 @@ print(X_ff_train_resampled.shape)
 print(X_ff_test_resampled.shape)
 
 from collections import Counter
-    # summarize observations by class labeL
+# summarize observations by class labeL
 counter = Counter(y_ff_train_resampled)
 print(counter) 
 #counter = Counter(y_ff_vald_resampled)
 #print(counter) 
 counter = Counter(y_ff_test_resampled)
 print(counter) 
-
+'''
 
 #convert binarized label (0, 1) into categorical data- this generates 2 classes
-Z1 = np.ravel(y_ff_train_resampled)
+Z1 = np.ravel(y_train)
 y_ff_train_resampled = to_categorical(Z1)
 #Z11 = np.ravel(y_ff_vald_resampled)
 #y_ff_vald_resampled = to_categorical(Z11)
 #y_test
-Z22 = np.ravel(y_ff_test_resampled)
+Z22 = np.ravel(y_test)
 y_ff_test_resampled = to_categorical(Z22)
 
 
 from sklearn.preprocessing import StandardScaler
 sc = StandardScaler()
-ff_training_set_scaled = sc.fit_transform(X_ff_train_resampled)
+ff_training_set_scaled = sc.fit_transform(X_train)
 #ff_vald_set_scaled = sc.transform(X_ff_vald_resampled)
-ff_testing_set_scaled = sc.transform(X_ff_test_resampled)
+ff_testing_set_scaled = sc.transform(X_test)
 
 n_features = 8
 #order = F,  fortran like is important for separating 2 features (first 128 columns = 1 feature, next 128 columns -2nd feature), else every alternate column become 1 feature. 
