@@ -305,7 +305,7 @@ for i in range(1,33):
     model2.summary()
     # fit network
     history=model2.fit(x_ff_train, y_ff_train_resampled, epochs=10, batch_size=500, verbose=1, validation_data=(x_ff_test, y_ff_test_resampled))
-    model2.save('LOSO_testsubject_' + i +'_ff8chnl_cnnlstm_500bs_128w_32o_model2_git.h5')
+    model2.save('LOSO_testsubject_' + str(i) +'_ff8chnl_cnnlstm_500bs_128w_32o_model2_git.h5')
     elapsed = time.time()-start
     print ('Training time: {elapsed in mins)}', hms_string(elapsed))
 
