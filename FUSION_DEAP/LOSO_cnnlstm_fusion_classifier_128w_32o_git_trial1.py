@@ -89,7 +89,7 @@ with ZipFile(file_name, 'r') as zip:
 bvp_data, bvp_label = joblib.load(open('lstm_slider128_bvp_raw_overlap32_withbaseline.dat', 'rb'))
 
 # specifying the zip file name
-file_name = "lstm_slider128_gsr_raw_overlap32_withbaseline.zip"
+file_name = "lstm_slider128_gsr_raw_overlap32_subID_withbaseline.zip"
 # opening the zip file in READ mode
 with ZipFile(file_name, 'r') as zip:
     # printing all the contents of the zip file
