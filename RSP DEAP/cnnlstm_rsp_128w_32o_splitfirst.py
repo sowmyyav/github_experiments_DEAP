@@ -78,7 +78,54 @@ y_valence = np.array(data_binarizer([el[0] for el in rsp_label1],5,5))
 X_train_rsp_val, X_test_rsp_val, y_train_rsp_val, y_test_rsp_val = train_test_split(rsp_data1, y_valence, test_size=0.2, random_state=42, stratify=y_valence)
 print('X_train_rsp_val', X_train_rsp_val.shape)
 print('X_test_rsp_val', X_test_rsp_val.shape)
-      
+   
+
+
+X_rsp_train_data = []
+Y_rsp_train_label = []
+
+for signal in range(0,X_train_rsp_val.shape[0]):
+    #signal = signal[384:8064]
+    #rsp_featurestrial = []
+    #https://github.com/siddhi5386/Emotion-Recognition-from-brain-EEG-signals-/blob/master/Emotion_recognition_using_LSTM.ipynb
+    start = 0;
+    window_size = 128 #Averaging band power of 2 sec
+    step_size = 32 #Each 0.125 sec update once
+    while start + window_size < X_train_rsp_val.shape[1] - 32:
+        X = X_train_rsp_val[signal][start : start + window_size]
+        start = start + step_size 
+        
+        #rsp_featurestrial.append(X)
+        Y_rsp_train_label.append(y_train_rsp_val[signal])
+        X_rsp_train_data.append(X)  
+   
+
+X_rsp_train_data = np.array(X_rsp_train_data)   
+Y_rsp_train_label = np.array(Y_rsp_train_label)  
+
+
+
+X_rsp_test_data = []
+Y_rsp_test_label = []
+
+for signal in range(0,X_test_rsp_val.shape[0]):
+    
+    #https://github.com/siddhi5386/Emotion-Recognition-from-brain-EEG-signals-/blob/master/Emotion_recognition_using_LSTM.ipynb
+    start = 0;
+    window_size = 128 #Averaging band power of 2 sec
+    step_size = 32 #Each 0.125 sec update once
+    while start + window_size < X_test_rsp_val.shape[1] - 32:
+        X = X_test_rsp_val[signal][start : start + window_size]
+        start = start + step_size 
+        
+        #rsp_featurestrial.append(X)
+        Y_rsp_test_label.append(y_test_rsp_val[signal])
+        X_rsp_test_data.append(X)  
+   
+
+X_rsp_test_data = np.array(X_rsp_test_data)   
+Y_rsp_test_label = np.array(Y_rsp_test_label)  
+
 
 #Create balanced data
 #oversample
@@ -86,9 +133,9 @@ print('X_test_rsp_val', X_test_rsp_val.shape)
 import imblearn
 from imblearn.over_sampling import RandomOverSampler
 ros = RandomOverSampler(random_state=0)
-X_rsp_train_resampled, y_rsp_train_resampled = ros.fit_resample(X_train_rsp_val, y_train_rsp_val)
+X_rsp_train_resampled, y_rsp_train_resampled = ros.fit_resample(X_rsp_train_data, Y_rsp_train_label)
 #X_ff_vald_resampled, y_ff_vald_resampled = ros.fit_resample(X_vald_ff_val, y_vald_ff_val)
-X_rsp_test_resampled, y_rsp_test_resampled = ros.fit_resample(X_test_rsp_val, y_test_rsp_val)
+X_rsp_test_resampled, y_rsp_test_resampled = ros.fit_resample(X_rsp_test_data, Y_rsp_test_label)
 print("x_rsp_train_resampled",X_rsp_train_resampled.shape)
 #print("x_ff_train_resampled",X_ff_vald_resampled.shape)
 print("x_rsp_test_resampled",X_rsp_test_resampled.shape)
@@ -171,4 +218,4 @@ es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=50)
 mc = ModelCheckpoint('rawresp_splitfirst_500bs_8064_model2.h5', monitor='accuracy', mode='max', verbose=1, save_best_only=True)
 model2.summary()
 # fit network
-history=model2.fit(x_rsp_train, y_rsp_train_resampled, epochs=20, batch_size=500, verbose=1, callbacks = [es,mc],validation_data=(x_rsp_test, y_rsp_test_resampled))
+history=model2.fit(x_rsp_train, y_rsp_train_resampled, epochs=200, batch_size=128, verbose=1, callbacks = [es,mc],validation_data=(x_rsp_test, y_rsp_test_resampled))
