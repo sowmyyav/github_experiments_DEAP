@@ -168,9 +168,9 @@ rsp_testing_set_scaled = sc.transform(X_rsp_test_resampled)
 
 n_features = 1
 #order = F,  fortran like is important for separating 2 features (first 128 columns = 1 feature, next 128 columns -2nd feature), else every alternate column become 1 feature. 
-x_rsp_train = rsp_training_set_scaled.reshape(rsp_training_set_scaled.shape[0], 8064,n_features,  order='F' ) 
+x_rsp_train = rsp_training_set_scaled.reshape(rsp_training_set_scaled.shape[0], 128,n_features,  order='F' ) 
 #x_ff_vald = ff_vald_set_scaled.reshape(ff_vald_set_scaled.shape[0], 128,n_features,  order='F' ) 
-x_rsp_test = rsp_testing_set_scaled.reshape(rsp_testing_set_scaled.shape[0], 8064, n_features, order='F')
+x_rsp_test = rsp_testing_set_scaled.reshape(rsp_testing_set_scaled.shape[0], 128, n_features, order='F')
 print("x_rsp_train_reshaped", x_rsp_train.shape)
 #print("x_rsp_vald_reshaped", x_rsp_vald.shape)
 print("x_rsp_test_reshaped", x_rsp_test.shape)
@@ -193,7 +193,7 @@ def hms_string(sec_elapsed):
 #with tf.device('/GPU:0'):
 with strategy.scope():
     model2 = Sequential()
-    model2.add(Conv1D(filters=64, kernel_size=3,  strides=1, activation='relu', input_shape=(8064,1)))
+    model2.add(Conv1D(filters=64, kernel_size=3,  strides=1, activation='relu', input_shape=(128,1)))
     model2.add(BatchNormalization())  
     #model2.add(Dropout(0.3))
     model2.add(Conv1D(filters=64, kernel_size=3,  strides=1, activation='relu'))
