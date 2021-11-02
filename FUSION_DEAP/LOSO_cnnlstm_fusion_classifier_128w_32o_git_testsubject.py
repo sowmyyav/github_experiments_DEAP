@@ -44,7 +44,7 @@ strategy = tf.distribute.MirroredStrategy(devices = GPUS, cross_device_ops=tf.di
 print('Number of devices: %d' % strategy.num_replicas_in_sync) 
 
 
-
+'''
 # importing required modules
 from zipfile import ZipFile
   
@@ -111,6 +111,7 @@ with ZipFile(file_name, 'r') as zip:
     print('Extracting all the files now...')
     zip.extractall()
     print('Done!')
+    
 rsp_data, rsp_label = joblib.load(open('lstm_slider128_rsp_raw_overlap32_withbaseline.dat', 'rb'))
 
 file_name = "lstm_slider128_eog1_raw_overlap32_withbaseline.zip"
@@ -149,7 +150,7 @@ with ZipFile(file_name, 'r') as zip:
     print('Done!')
 tmp_data, tmp_label = joblib.load(open('lstm_slider128w_tmp_raw_32o_withbaseline.dat', 'rb'))
 
-'''
+
 emg1_data, emg1_label = joblib.load(open('C:/Users/Sowmya/OneDrive - Athlone Institute Of Technology/PhD/DEAP/DATABASE/Python code/LSTM/EMG/lstm_slider128_emg1_raw_overlap32_withbaseline.dat', 'rb'))
 emg2_data, emg2_label = joblib.load(open('C:/Users/Sowmya/OneDrive - Athlone Institute Of Technology/PhD/DEAP/DATABASE/Python code/LSTM/EMG/lstm_slider128_emg2_raw_overlap32_withbaseline.dat', 'rb'))
 eog1_data, eog1_label = joblib.load(open('C:/Users/Sowmya/OneDrive - Athlone Institute Of Technology/PhD/DEAP/DATABASE/Python code/data/lstm_slider128_eog1_raw_overlap32_withbaseline.dat', 'rb'))
@@ -158,7 +159,19 @@ bvp_data, bvp_label = joblib.load(open('C:/Users/Sowmya/OneDrive - Athlone Insti
 rsp_data, rsp_label = joblib.load(open('C:/Users/Sowmya/OneDrive - Athlone Institute Of Technology/PhD/DEAP/DATABASE/Python code/data/lstm_slider128_rsp_raw_overlap32_withbaseline.dat', 'rb'))
 sub_ID, gsr_data, gsr_label = joblib.load(open('C:/Users/Sowmya/OneDrive - Athlone Institute Of Technology/PhD/DEAP/DATABASE/Python code/LSTM/GSR/lstm_slider128_gsr_raw_overlap32_subID_withbaseline.dat', 'rb'))
 tmp_data, tmp_label = joblib.load(open('C:/Users/Sowmya/OneDrive - Athlone Institute Of Technology/PhD/DEAP/DATABASE/Python code/data/lstm_slider128w_tmp_raw_32o_withbaseline.dat', 'rb'))
+
+
 '''
+
+emg1_data, emg1_label = joblib.load(open('lstm_slider128_emg1_raw_overlap32_withbaseline.dat', 'rb'))
+emg2_data, emg2_label = joblib.load(open('lstm_slider128_emg2_raw_overlap32_withbaseline.dat', 'rb'))
+bvp_data, bvp_label = joblib.load(open('lstm_slider128_bvp_raw_overlap32_withbaseline.dat', 'rb'))
+sub_ID, gsr_data, gsr_label = joblib.load(open('lstm_slider128_gsr_raw_overlap32_subID_withbaseline.dat', 'rb'))
+rsp_data, rsp_label = joblib.load(open('lstm_slider128_rsp_raw_overlap32_withbaseline.dat', 'rb'))
+eog1_data, eog1_label = joblib.load(open('lstm_slider128_eog1_raw_overlap32_withbaseline.dat', 'rb'))
+eog2_data, eog2_label = joblib.load(open('lstm_slider128_eog2_raw_overlap32_withbaseline.dat', 'rb'))
+tmp_data, tmp_label = joblib.load(open('lstm_slider128w_tmp_raw_32o_withbaseline.dat', 'rb'))
+
 
 fusion_data = np.hstack((emg1_data ,emg2_data, eog1_data, eog2_data, bvp_data, rsp_data, tmp_data, gsr_data ))
 
@@ -194,7 +207,7 @@ print(fusion_data.shape)
 #loss = []
 
 #for i in range(1,33):
-i = 1
+i = 14
 print("test subject : ", i)
 LOOCV_O = str(i)
 fusion_data['subID'] = fusion_data['subID'].apply(str)
@@ -218,7 +231,7 @@ y_train = np.array(data_train['y_val']) #Outcome variable here
 print(X_train.shape)
 print(y_train.shape)
 
-'''
+
 # Create balanced data
 #oversample
 import imblearn
@@ -239,23 +252,23 @@ print(counter)
 #print(counter) 
 counter = Counter(y_ff_test_resampled)
 print(counter) 
-'''
+
 
 #convert binarized label (0, 1) into categorical data- this generates 2 classes
-Z1 = np.ravel(y_train)
+Z1 = np.ravel(y_ff_train_resampled)
 y_ff_train_resampled = to_categorical(Z1)
 #Z11 = np.ravel(y_ff_vald_resampled)
 #y_ff_vald_resampled = to_categorical(Z11)
 #y_test
-Z22 = np.ravel(y_test)
+Z22 = np.ravel(y_ff_test_resampled)
 y_ff_test_resampled = to_categorical(Z22)
 
 
 from sklearn.preprocessing import StandardScaler
 sc = StandardScaler()
-ff_training_set_scaled = sc.fit_transform(X_train)
+ff_training_set_scaled = sc.fit_transform(X_ff_train_resampled)
 #ff_vald_set_scaled = sc.transform(X_ff_vald_resampled)
-ff_testing_set_scaled = sc.transform(X_test)
+ff_testing_set_scaled = sc.transform(X_ff_test_resampled)
 
 n_features = 8
 #order = F,  fortran like is important for separating 2 features (first 128 columns = 1 feature, next 128 columns -2nd feature), else every alternate column become 1 feature. 
@@ -279,34 +292,36 @@ with strategy.scope():
     
     #this was run with threshold 5 and added extra conv1d layer dropout after FIRST, second and third conv1d layer 
     
-    model2 = Sequential()
-    model2.add(Conv1D(filters=64, kernel_size=3,  strides=1, activation='relu', input_shape=(x_ff_train.shape[1],x_ff_train.shape[2])))
-    model2.add(BatchNormalization())  
-    #model2.add(Dropout(0.3))
-    model2.add(Conv1D(filters=64, kernel_size=3,  strides=1, activation='relu'))
-    model2.add(BatchNormalization())  
-    #model2.add(Dropout(0.3))
-    model2.add(Conv1D(filters=128, kernel_size=3, activation='relu'))
-    model2.add(BatchNormalization())
-    model2.add(Dropout(0.3))
-    model2.add(Bidirectional(LSTM(64, return_sequences=True)))
-    model2.add(BatchNormalization())
-    model2.add(Dropout(0.3))
-    model2.add(Bidirectional(LSTM(64)))
-    model2.add(BatchNormalization())
-    model2.add(Dropout(0.3))
-    model2.add(Dense(100, activation='relu'))
-    model2.add(BatchNormalization())
-    model2.add(Dropout(0.3))
-    model2.add(Dense(2, activation='softmax'))
-    model2.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model1 = Sequential()
+    model1.add(Conv1D(filters=64, kernel_size=3,  strides=1, activation='tanh', input_shape=(x_ff_train.shape[1],x_ff_train.shape[2])))
+    model1.add(BatchNormalization())  
+    #model1.add(Dropout(0.3))
+    model1.add(Conv1D(filters=64, kernel_size=3,  strides=1, activation='tanh'))
+    model1.add(BatchNormalization())  
+    model1.add(Dropout(0.5))
+    model1.add(MaxPooling1D(pool_size=2))
+    model1.add(Conv1D(filters=128, kernel_size=3, activation='tanh'))
+    model1.add(BatchNormalization())
+    model1.add(Dropout(0.5))
+    model1.add(MaxPooling1D(pool_size=2))
+    model1.add(Bidirectional(LSTM(64, return_sequences=True)))
+    model1.add(BatchNormalization())
+    model1.add(Dropout(0.3))
+    model1.add(Bidirectional(LSTM(64)))
+    model1.add(BatchNormalization())
+    model1.add(Dropout(0.3))
+    model1.add(Dense(100, activation='relu'))
+    model1.add(BatchNormalization())
+    model1.add(Dropout(0.3))
+    model1.add(Dense(2, activation='softmax'))
+    model1.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 # patient early stopping
-es = EarlyStopping(monitor='accuracy', mode='max', verbose=1, patience=70)
-#mc = ModelCheckpoint('LOSO_ff8channels_500bs_128w_32o_model2_git.h5', monitor='accuracy', mode='max', verbose=1, save_best_only=True)
-model2.summary()
+es = EarlyStopping(monitor='val_accuracy', mode='max', verbose=1, patience=50)
+#mc = ModelCheckpoint('LOSO_ff8channels_500bs_128w_32o_model1_git.h5', monitor='accuracy', mode='max', verbose=1, save_best_only=True)
+model1.summary()
 # fit network
-history=model2.fit(x_ff_train, y_ff_train_resampled, epochs=200, batch_size=500, verbose=1, callbacks = [es],  validation_data=(x_ff_test, y_ff_test_resampled))
-model2.save('LOSO_testsubject_' + str(i) +'_ff8chnl_cnnlstm_500bs_128w_32o_model2_git.h5')
+history=model1.fit(x_ff_train, y_ff_train_resampled, epochs=200, batch_size=500, verbose=1, callbacks = [es],  validation_data=(x_ff_test, y_ff_test_resampled))
+model1.save('LOSO_testsubject_' + str(i) +'_ff8chnl_cnnlstm_500bs_128w_32o_model1_git.h5')
 elapsed = time.time()-start
 print ('Training time: {elapsed in mins}', hms_string(elapsed))
 
