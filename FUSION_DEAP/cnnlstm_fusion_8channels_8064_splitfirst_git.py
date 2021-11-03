@@ -35,35 +35,36 @@ from tensorflow.keras import optimizers
 from keras.callbacks import EarlyStopping
 from keras.callbacks import ModelCheckpoint
 
-rsp_data, rsp_label = joblib.load(open('C:/Users/Sowmya/Desktop/github_experiments/FUSION_DEAP/Resp_32data_raw.dat', 'rb'))
+rsp_data, rsp_label = joblib.load(open('Resp_32data_raw.dat', 'rb'))
 rsp_data = np.array(rsp_data)   
 rsp_label = np.array(rsp_label)  
 
-emg1_data, emg1_label = joblib.load(open('C:/Users/Sowmya/Desktop/github_experiments/FUSION_DEAP/EMG1_32data_raw.dat', 'rb'))
+emg1_data, emg1_label = joblib.load(open('EMG1_32data_raw.dat', 'rb'))
 emg1_data = np.array(emg1_data)   
 emg1_label = np.array(emg1_label)  
 
-emg2_data, emg2_label = joblib.load(open('C:/Users/Sowmya/Desktop/github_experiments/FUSION_DEAP/EMG2_32data_raw.dat', 'rb'))
+emg2_data, emg2_label = joblib.load(open('EMG2_32data_raw.dat', 'rb'))
 emg2_data = np.array(emg2_data)   
 emg2_label = np.array(emg2_label)  
 
-eog1_data, eog1_label = joblib.load(open('C:/Users/Sowmya/Desktop/github_experiments/FUSION_DEAP/EOG1_32data_raw.dat', 'rb'))
+eog1_data, eog1_label = joblib.load(open('EOG1_32data_raw.dat', 'rb'))
 eog1_data = np.array(eog1_data)   
 eog1_label = np.array(eog1_label)  
 
-eog2_data, eog2_label = joblib.load(open('C:/Users/Sowmya/Desktop/github_experiments/FUSION_DEAP/EOG2_32data_raw.dat', 'rb'))
+eog2_data, eog2_label = joblib.load(open('EOG2_32data_raw.dat', 'rb'))
 eog2_data = np.array(eog2_data)   
 eog2_label = np.array(eog2_label)  
 
-gsr_data, gsr_label = joblib.load(open('C:/Users/Sowmya/Desktop/github_experiments/FUSION_DEAP/GSR_32data_raw.dat', 'rb'))
+gsr_data, gsr_label = joblib.load(open('GSR_32data_raw.dat', 'rb'))
 gsr_data = np.array(gsr_data)   
 gsr_label = np.array(gsr_label)  
 
-bvp_data, bvp_label = joblib.load(open('C:/Users/Sowmya/Desktop/github_experiments/FUSION_DEAP/Pleth_32data_raw.dat', 'rb'))
+bvp_data, bvp_label = joblib.load(open('Pleth_32data_raw.dat', 'rb'))
 bvp_data = np.array(bvp_data)   
 bvp_label = np.array(bvp_label)  
 
-tmp_data, tmp_label = joblib.load(open('C:/Users/Sowmya/Desktop/github_experiments/FUSION_DEAP/Tmp_32data_raw.dat', 'rb'))
+#tmp_data, tmp_label = joblib.load(open('C:/Users/Sowmya/Desktop/github_experiments/FUSION_DEAP/Tmp_32data_raw.dat', 'rb'))
+tmp_data, tmp_label = joblib.load(open('Tmp_32data_raw.dat', 'rb'))
 tmp_data = np.array(tmp_data)   
 tmp_label = np.array(tmp_label)  
 
